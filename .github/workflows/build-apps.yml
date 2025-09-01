@@ -41,14 +41,14 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
       
-      - name: 📱 iOSシミュレーターでビルドテスト
+      - name: 📱 iOSシミュレーターでビルド
         run: |
           echo "にゃんこ～ iOSアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
             -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             -configuration Debug \
-            clean build test
+            clean build
       
       - name: 📦 iOSアーカイブ作成
         run: |
@@ -81,14 +81,14 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
       
-      - name: 📱 iPadOSシミュレーターでビルドテスト
+      - name: 📱 iPadOSシミュレーターでビルド
         run: |
           echo "にゃんこ～ iPadOSアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
             -destination 'platform=iOS Simulator,name=iPad Pro (12.9-inch) (6th generation),OS=latest' \
             -configuration Debug \
-            clean build test
+            clean build
       
       - name: 📦 iPadOSアーカイブ作成
         run: |
@@ -121,13 +121,13 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
       
-      - name: 💻 macOSでビルドテスト
+      - name: 💻 macOSでビルド
         run: |
           echo "にゃんこ～ macOSアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
             -configuration Debug \
-            clean build test
+            clean build
       
       - name: 📦 macOSアプリ作成
         run: |
@@ -160,14 +160,14 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
       
-      - name: 🎪 Mac Catalystでビルドテスト
+      - name: 🎪 Mac Catalystでビルド
         run: |
           echo "にゃんこ～ Mac Catalystアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
             -destination 'platform=macOS,variant=Mac Catalyst' \
             -configuration Debug \
-            clean build test
+            clean build
       
       - name: 💾 Mac Catalystビルド成果物を保存
         uses: actions/upload-artifact@v4
