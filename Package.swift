@@ -23,6 +23,7 @@ let package = Package(
         .executableTarget(
             name: "nekotan",
             dependencies: ["NekoTanLib"],
+            path: "Sources",
             resources: [
                 .copy("../fonts")
             ]
