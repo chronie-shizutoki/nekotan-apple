@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 /// View for displaying the list of diary entries
 struct DiaryListView: View {
@@ -153,7 +154,7 @@ struct DiaryListView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     // All categories button
-                    categoryFilterButton("All")
+                    categoryFilterButton(NSLocalizedString("All", comment: "All categories"))
                     
                     // Category buttons
                     ForEach(viewModel.categories) { category in
@@ -168,7 +169,7 @@ struct DiaryListView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         // All tags button
-                        tagFilterButton("All")
+                        tagFilterButton(NSLocalizedString("All", comment: "All tags"))
                         
                         // Tag buttons for selected category
                         ForEach(viewModel.tags.filter { tag in

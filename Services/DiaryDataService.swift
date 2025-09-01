@@ -7,6 +7,9 @@
 
 import Foundation
 
+// Import shared error types
+import DiaryError
+
 /// Protocol defining diary data operations
 protocol DiaryDataService {
     /// Loads all diary entries

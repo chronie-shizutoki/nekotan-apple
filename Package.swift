@@ -26,6 +26,7 @@ let package = Package(
         // Library target for reuse across platforms
         .target(
             name: "NekoTanLib",
+            sources: ["Views"],
             resources: [
                 .copy("../fonts")
             ]

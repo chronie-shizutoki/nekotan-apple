@@ -8,6 +8,9 @@
 import Foundation
 import Combine
 
+// Import shared error types
+import DiaryError
+
 /// ViewModel for managing diary entries
 class DiaryViewModel: ObservableObject {
     // MARK: - Published Properties
@@ -279,34 +282,5 @@ class DiaryViewModel: ObservableObject {
     }
 }
 
-// MARK: - Error Types
-
-/// Errors related to diary operations
-enum DiaryError: Error, LocalizedError {
-    /// Content is empty
-    case emptyContent
-    /// Failed to parse CSV
-    case csvParsingFailed
-    /// Failed to save diary
-    case saveFailed
-    /// Failed to load diaries
-    case loadFailed
-    /// Failed to delete diary
-    case deleteFailed
-    
-    /// Error description
-    var errorDescription: String? {
-        switch self {
-        case .emptyContent:
-            return "Diary content cannot be empty"
-        case .csvParsingFailed:
-            return "Failed to parse CSV data"
-        case .saveFailed:
-            return "Failed to save diary"
-        case .loadFailed:
-            return "Failed to load diaries"
-        case .deleteFailed:
-            return "Failed to delete diary"
-        }
-    }
-}
+// Import shared error types
+import Foundation

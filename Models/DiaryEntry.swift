@@ -110,9 +110,14 @@ extension DiaryEntry {
         let escapedContent = content.replacingOccurrences(of: "\"", with: "\"\"")
         let escapedCategory = category.replacingOccurrences(of: "\"", with: "\"\"")
         let escapedTags = tags.joined(separator: ";").replacingOccurrences(of: "\"", with: "\"\"")
-        
-        return "\\(id),\"\\(date.ISO8601Format())\",\"\\(escapedContent)\",\"\\(escapedCategory)\",\"\\(escapedTags)\""
+
+        // Use ISO8601DateFormatter for compatibility with older system versions
+        let dateFormatter = ISO8601DateFormatter()
+        let dateString = dateFormatter.string(from: date)
+
+        return "\(id),\"\(dateString)\",\"\(escapedContent)\",\"\(escapedCategory)\",\"\(escapedTags)\""
     }
+}
     
     /// Creates a diary entry from a CSV row
     /// - Parameter csvRow: CSV row string
@@ -142,4 +147,3 @@ extension DiaryEntry {
     static var csvHeader: String {
         return "id,date,content,category,tags"
     }
-}

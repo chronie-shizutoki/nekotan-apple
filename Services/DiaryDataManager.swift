@@ -8,6 +8,9 @@
 import Foundation
 import CoreData
 
+// Import shared error types
+import DiaryError
+
 /// Implementation of DiaryDataService using CoreData and file-based storage
 class DiaryDataManager: DiaryDataService {
     // MARK: - Private Properties

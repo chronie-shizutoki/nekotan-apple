@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import UIKit
+import CustomCharts
+import SettingsView
 
 /// Main content view of the application
 struct ContentView: View {
@@ -180,6 +183,33 @@ struct StatisticsView: View {
                         .padding()
                     }
                     
+                    // Chart visualization section
+                    Section(header: Text("ビジュアル統計").font(.kleeOne(size: 18)).foregroundColor(themeColors[themeColor])) {
+                        // Category distribution pie chart
+                        if !viewModel.prepareCategoryPieData().isEmpty {
+                            KawaiiPieChart(
+                                data: viewModel.prepareCategoryPieData(),
+                                themeColor: themeColors[themeColor]
+                            )
+                        }
+                        
+                        // Monthly trend line chart
+                        if !viewModel.prepareMonthlyTrendData().isEmpty {
+                            KawaiiLineChart(
+                                data: viewModel.prepareMonthlyTrendData(),
+                                themeColor: themeColors[themeColor]
+                            )
+                        }
+                        
+                        // Category statistics bar chart
+                        if !viewModel.prepareCategoryChartData().isEmpty {
+                            KawaiiBarChart(
+                                data: viewModel.prepareCategoryChartData(),
+                                themeColor: themeColors[themeColor]
+                            )
+                        }
+                    }
+                    
                     // Category statistics with cute design
                     Section(header: Text("カテゴリー統計").font(.kleeOne(size: 18)).foregroundColor(themeColors[themeColor])) {
                         ForEach(viewModel.categories.filter { $0.count > 0 }.sorted(by: { $0.count > $1.count }).prefix(10)) { category in
@@ -347,97 +377,7 @@ struct StatisticsView: View {
     }
 }
 
-// MARK: - Settings View with cute design
-struct SettingsView: View {
-    @AppStorage("isDarkMode") private var isDarkMode = false
-    @AppStorage("enableAnimations") private var enableAnimations = true
-    @AppStorage("fontSize") private var fontSize = 1 // 0: small, 1: medium, 2: large
-    @AppStorage("themeColor") private var themeColor = 0 // 0: pink, 1: purple, 2: blue, 3: yellow
-    @AppStorage("showSakuraEffect") private var showSakuraEffect = true
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                // Appearance Section
-                Section(header: Text("見た目").font(.kleeOne(size: 18))) {
-                    // Dark Mode Toggle
-                    Toggle("ダークモード", isOn: $isDarkMode)
-                        .onChange(of: isDarkMode) {
-                            // Update appearance when dark mode setting changes
-                            if isDarkMode {
-                                UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .dark
-                            } else {
-                                UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .light
-                            }
-                        }
-                    
-                    // Animation Toggle
-                    Toggle("アニメーション", isOn: $enableAnimations)
-                    
-                    // Cherry Blossom Effect Toggle
-                    Toggle("桜のエフェクト", isOn: $showSakuraEffect)
-                    
-                    // Font Size Picker
-                    Picker("フォントサイズ", selection: $fontSize) {
-                        Text("小さい").tag(0)
-                        Text("普通").tag(1)
-                        Text("大きい").tag(2)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    
-                    // Theme Color Picker
-                    Section(header: Text("テーマカラー").font(.kleeOne(size: 16))) {
-                        HStack(spacing: 12) {
-                            Button(action: { themeColor = 0 }) {
-                                Circle().fill(Color.pink).frame(width: 40, height: 40)
-                                    .overlay(themeColor == 0 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
-                                    .bounceAnimation(strength: 0.5, duration: 0.5)
-                            }
-                            Button(action: { themeColor = 1 }) {
-                                Circle().fill(Color.purple).frame(width: 40, height: 40)
-                                    .overlay(themeColor == 1 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
-                                    .bounceAnimation(strength: 0.5, duration: 0.5)
-                            }
-                            Button(action: { themeColor = 2 }) {
-                                Circle().fill(Color.blue).frame(width: 40, height: 40)
-                                    .overlay(themeColor == 2 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
-                                    .bounceAnimation(strength: 0.5, duration: 0.5)
-                            }
-                            Button(action: { themeColor = 3 }) {
-                                Circle().fill(Color.yellow).frame(width: 40, height: 40)
-                                    .overlay(themeColor == 3 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
-                                    .bounceAnimation(strength: 0.5, duration: 0.5)
-                            }
-                        }
-                    }
-                }
-                
-                // About Section
-                Section(header: Text("アプリについて").font(.kleeOne(size: 18))) {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            Image(systemName: "heart.fill")
-                                .resizable()
-                                .frame(width: 60, height: 60)
-                                .foregroundColor(Color.pink)
-                                .floatAnimation(amplitude: 5, frequency: 1)
-                            Text("ネコタンの日記")
-                                .font(.kleeOne(size: 24))
-                                .foregroundColor(Color.pink)
-                            Text("バージョン 1.0")
-                                .font(.kleeOne(size: 14))
-                                .foregroundColor(Color.purple)
-                        }
-                        Spacer()
-                    }
-                }
-            }
-            .navigationTitle("設定")
-            .wavyBackground(color: Color.pink.opacity(0.1))
-        }
-    }
-}
+
 
 // MARK: - Preview
 
