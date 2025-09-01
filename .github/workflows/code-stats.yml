@@ -11,15 +11,21 @@ permissions:
 
 jobs:
   code-stats:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      
+      - name: Set up Swift environment
+        uses: swift-actions/setup-swift@v1
         with:
-          node-version: '18'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
+          swift-version: '6.1'
+          
+      - name: Install cloc
+        run: brew install cloc
+        
       - name: Run cloc
-        run: npx cloc --exclude-dir=node_modules --exclude-list-file=.cloc-exclude .
+        run: |
+          cloc --exclude-dir=.build,Package.swift,.swiftpm \
+               --exclude-ext=.DS_Store \
+               --not-match-f='Package.resolved' \
+               .
