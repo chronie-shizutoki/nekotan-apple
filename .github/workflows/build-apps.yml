@@ -175,7 +175,7 @@ jobs:
           echo "にゃんこ～ Mac Catalystアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
-            -destination 'platform=macOS,variant=Mac Catalyst' \
+            -destination 'platform=macOS,arch=arm64,variant=Designed for [iPad,iPhone]' \
             -configuration Debug \
             clean build
       
