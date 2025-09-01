@@ -1,28 +1,31 @@
-# 静時ねこたんの日記帳🐾
+# 静時ねこたんの日記帳🐾 (Swift版)
 
-にゃんこみたいに優しい日記アプリで、毎日の思い出をかわいく記録できるにゃ～♡  
-キラキラなインターフェースで、あなたのお気持ちをそっと保管するよ～✨
+にゃんこみたいに優しいiOS/iPad OS/macOS日記アプリで、毎日の思い出をかわいく記録できるにゃ～♡  
+SwiftUIで作られたキラキラなインターフェースで、あなたのお気持ちをそっと保管するよ～✨
 
 ## 国際化だにゃ～🌍
 
 世界中の猫ちゃんと仲良くするために、多言語対応をがんばってるにゃ！  
+(ごめんにゃ～、まだ準備中だよ～ 🚧)
 
+<!-- 
 - 英語だにゃ: [English](README-en.md)  
 - 韓国語ニャン: [한국어](README-ko.md)  
 - 中国語(簡体字)にゃん: [简体中文](README-zh.md)  
 - 中国語(繁体字)にゃ～: [繁體中文](README-tw.md)
+-->
 
 ## リソースのおうち🏠
 
 使ってる素材は全部お家で管理してるにゃ：  
 
 ### フォントちゃん  
-`public/vendor/fonts` においるにゃ～  
-- KleeOne-Regular.woff2 - ふにゃふにゃ文字  
+`fonts/` においるにゃ～  
+- KleeOne-Regular.ttf - ふにゃふにゃ文字  
 
-### JavaScriptライブラリ  
-`public/vendor/js` でお昼寝中🐾  
-- fastclick.min.js - 早押しボタンライブラリ (v1.0.6)  
+### Swiftパッケージ  
+`Package.swift` でお昼寝中🐾  
+- Swift 6.1以上 - 最新のにゃんこ言語✨  
 
 ## にゃんとこ自慢機能✨  
 
@@ -32,12 +35,14 @@
 - 🔍 キーワードひとつで魔法みたいに検索～✨  
 - 📤 CSV/JSONで思い出のお引っ越し可能にゃ📦  
 - 📊 自動バックアップでぐっすり安心睡眠😴💤  
-- 📱 モバイルでも肉球でらくらく操作～🐾  
+- 📱 iOS/iPad OS/macOS両方で肉球でらくらく操作～🐾  
+- 🌙 ダークモード対応でお月様と一緒に✨  
 
 ## 必要なもの🍼  
 
-- Node.js >= 14.0.0 (にゃんこバージョン以上だにゃ)  
-- PM2 (おうち全体にインストールしてね)  
+- Xcode 15.0以上 (にゃんこ開発環境だにゃ)  
+- iOS 15.0以上 / iPad OS 15.0以上 / macOS 12.0以上  
+- Swift 6.1以上 (最新のにゃんこ言語)  
 
 ## はじめかた🐾  
 
@@ -45,49 +50,44 @@
 
 ```bash
 # お家に連れてくるにゃ～
-git clone https://github.com/quiettimejsg/nekotan.git  
+git clone https://github.com/chronie-shizutoki/nekotan.git  
 cd nekochan  
 
-# おやつを準備するにゃん
-npm install  
-
-# お世話係を呼ぶにゃ
-npm install -g pm2
+# Xcodeで開くにゃん
+open NekoTan.xcodeproj
 ```
 
 ## お部屋の飾りつけ✨  
 
-`.env`ファイルでお好み設定にゃ～：  
+Xcodeでお好み設定にゃ～：  
 
-```env
-PORT=3000                 # おうちのドア番号🚪  
-NODE_ENV=production       # おでかけモード設定🎀  
-MAX_FILE_SIZE=5242880     # お写真の大きさ(5MB)📸  
-LOG_LEVEL=info            # おしゃべり量設定💬  
-BACKUP_RETENTION_DAYS=30  # 思い出の保存期間📆  
-CORS_ORIGIN=*             # お友達みんな仲良し設定🌈  
-```
+- iOS Deployment Target: 15.0以上 🍎  
+- iPad OS Deployment Target: 15.0以上 🍎  
+- macOS Deployment Target: 12.0以上 💻  
+- Swift Language Version: 6.1以上 🚀  
 
 ## 起動コマンド🐾  
 
-お遊びモードで起動：  
+Xcodeでお遊びモード：  
 ```bash
-npm run dev  # わくわく開発モード💫  
+# シミュレーターで起動
+Product > Run (⌘+R)  # わくわく開発モード💫  
 ```  
 
-本番モードでお仕事：  
+実機でお仕事：  
 ```bash
-npm run prod  # まじめにゃんモード👑  
+# デバイスにインストール
+Product > Run on Device  # まじめにゃんモード👑  
 ```  
 
 その他のお世話：  
-- `npm run stop`：おやすみなさいにゃ～🌙  
-- `npm run restart`：元気に再起動！🔁  
-- `npm run logs`：今日のおはなしを見る📖  
+- `Product > Clean Build Folder`：お掃除タイム🧹  
+- `Product > Build`：元気にビルド！🔨  
+- `Product > Test`：テストしてみるにゃ～🧪  
 
 ## 使いかた💖  
 
-1. ログインしてにゃんこ画面をぽんぽん✨  
+1. アプリを起動してにゃんこ画面をぽんぽん✨  
 2. ぷくぷく「新規日記」ボタンをタッチ！  
 3. タイトルとお気持ちをにゃんと入力📝  
 4. カテゴリーとタグでおしゃれ整理🎀  
@@ -99,78 +99,41 @@ npm run prod  # まじめにゃんモード👑
 nekochan/
 ├── .github/                            # GitHubのお手紙箱✉️
 │   └── workflows/                      # 自動お仕事マシン⚙️
-│       └── code-stats.yml              # コードのお背丈測定📏
-├── public/                             # みんなに見せるお部屋✨
-│   ├── css/                            # おしゃれ洋服ダンス👗
-│   │   ├── animations/                 # 動き方レシピ帳💫
-│   │   │   ├── input-animations.css    # 文字入力ダンス💃
-│   │   │   ├── keyframe.css            # キラキラ動きの秘密✨
-│   │   │   ├── sakura.css              # 桜の舞い方🌸
-│   │   ├── base/                       # お肌の手入れセット💅
-│   │   │   ├── performance.css         # 速く動くコツ🐇
-│   │   │   ├── variables.css           # 色のパレット🎨
-│   │   ├── components/                 # パーツのおもちゃ箱🧸
-│   │   │   ├── alerts.css              # お知らせカード🔔
-│   │   │   ├── buttons.css             # ぷにぷにボタン🎮
-│   │   │   ├── clock.css               # チクタク時計⏰
-│   │   │   ├── diary.css               # 日記帳デザイン📖
-│   │   │   ├── history.css             # 思い出アルバム📚
-│   │   │   ├── layout.css              # お部屋の間取り🏠
-│   │   │   ├── search.css              # 宝探しセット🔍
-│   │   │   └── tags.css                # ネコタグコレクション🏷️
-│   │   ├── themes/                     # お洋服チェンジャー👘
-│   │   │   └── dark.css                # お月様モード🌙
-│   │   ├── main.css                    # メインお洋服✨
-│   │   └── style.css                   # 共通おしゃれセット🎀
-│   ├── js/                             # 動くおもちゃ箱🎪
-│   │   ├── managers/                   # お世話係さん👩‍🍼
-│   │   │   ├── EventHandler.js         # イベント受け付け係🎪
-│   │   │   ├── TagManager.js           # タグ整理係🏷️
-│   │   │   └── UIManager.js            # 見た目デザイナー🎨
-│   │   ├── app.js                      # 心臓ドキドキ❤️
-│   │   ├── DiaryManager.js             # 日記お守り係📝
-│   │   ├── InputAnimator.js            # 魔法の動き係✨
-│   │   ├── Logger.js                   # 思い出記録係📜
-│   │   ├── sakura.js                   # 桜吹雪マシン🌸
-│   │   └── TimeUpdater.js              # 時間お知らせ係⏰
-│   ├── uploads/                        # お写真アルバム📸
-│   └── vendor/                         # お友達の家🏠
-│       ├── fonts/                      # 文字の遊び場✏️
-│       │   ├── font.css                # 文字の服👕
-│       │   ├── KleeOne-Regular.ttf     # ふにゃふにゃ文字🐾
-│       │   └── OFL.txt                 # お約束カード📜
-│       ├── js/                         # 便利道具箱🧰
-│       │   └── fastclick.min.js        # 早押しボタン⚡
-│       └── picture/                    # 飾り絵の箱🖼️
-│           └── sakura.svg              # 桜の絵はがき🌸
-├── .vscode/                            # お絵描き道具箱🎨
-│   └── launch.json                     # 魔法の呪文書🪄
-├── .cloc-exclude                       # 秘密のメモ🙈
-├── .env.example                        # お部屋設定見本🏠
-├── .gitignore                          # 見せないリスト🙈
+├── Sources/                            # Swiftの心臓部❤️
+│   ├── NekoTanLib/                     # メインライブラリ📚
+│   │   ├── iOS/                        # iPhone/iPad用画面📱
+│   │   ├── macOS/                      # Mac用画面💻
+│   │   ├── Assets.xcassets/            # 絵とアイコン🎨
+│   │   ├── NekoTanApp.swift            # アプリの入り口🚪
+│   │   ├── NekoTan.entitlements        # 権限設定🔐
+│   │   └── Info.plist                  # アプリ情報📋
+│   └── main.swift                      # 起動の合図🚀
+├── Views/                              # 画面デザイン🎭
+├── App/                                # アプリ本体🏠
+├── Models/                             # データの形📊
+├── Services/                           # お世話係👩‍🍼
+├── ViewModels/                         # 画面の頭脳🧠
+├── fonts/                              # 文字の遊び場✏️
+│   └── KleeOne-Regular.ttf             # ふにゃふにゃ文字🐾
+├── NekoTan.xcodeproj/                  # Xcodeプロジェクト📁
+├── Package.swift                       # Swiftパッケージ設定📦
+├── APPLE_PLATFORMS.md                  # Appleプラットフォーム説明🍎
+├── Architecture.md                     # 設計図📐
 ├── diaries.csv                         # 思い出宝石箱💎
 ├── LICENSE                             # お約束カード📜
-├── index.html                          # 玄関ドア🚪
-├── backup-20250524-194510.tar.gz       # 思い出バックアップ💾
-├── nekochan-1.0.0.tgz                  # お引越しセット📦
-├── package-lock.json                   # おやつリスト🔒
-├── logs/                               # 毎日の日記帳📖
-├── backups/                            # 思い出の宝物庫💖
-├── server.js                           # 心臓部ドキドキ❤️
-├── ecosystem.config.js                 # お世話マニュアル📖
-└── package.json                        # お世話係手帳📔
+└── .gitignore                          # 見せないリスト🙈
 ```
 
 ## 思い出のお守り💾  
 
 - 毎日自動でバックアップされるにゃ～  
-- `backups/` フォルダで30日間お預かり  
-- 環境変数で期間変更可能にゃん📅  
+- iCloud同期でデバイス間お引っ越し可能✨  
+- 環境設定で期間変更可能にゃん📅  
 
 ## 安全対策🔐  
 
-- ヘルメットで頭ガード(Helmet.js)🧢  
-- みんなと仲良く通信設定(CORS)🤝  
+- Appleのセキュリティガイドライン厳守🍎  
+- データ暗号化で大切な思い出をガード🔒  
 - 怪しい入力はシャットアウト！🚫  
 
 ## ライセンスについて📜  
@@ -178,7 +141,20 @@ nekochan/
 AGPL-3.0 ライセンスだにゃ～  
 フォントちゃんは SIL Open Font License 1.1 でお留守番  
 
+## 開発者向け情報👩‍💻  
+
+### アーキテクチャ
+- **MVVM**: Model-View-ViewModelパターンで整理整頓✨
+- **SwiftUI**: 最新の宣言的UIフレームワーク🎨
+- **Combine**: リアクティブプログラミングでスムーズ動作🚀
+
+### プラットフォーム対応
+- **iOS**: iPhone/iPad両対応📱
+- **macOS**: Mac用デスクトップアプリ💻
+- **macCatalyst**: iPadアプリをMacで動かす🎪
+
 ### 最後ににゃ～💕  
 いつもあなたの大切な思い出を、  
 つぶらな瞳で見守ってるにゃん🐾  
 素敵な毎日がたくさん記録できますように～✨  
+SwiftUIの魔法で、もっと可愛く、もっと使いやすく！🌟  
