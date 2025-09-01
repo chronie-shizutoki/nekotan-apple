@@ -11,41 +11,25 @@ let package = Package(
         .macCatalyst(.v15)
     ],
     products: [
-        .library(name: "NekoTanLib", targets: ["NekoTanLib"]),
-        .executable(name: "NekoTanApp", targets: ["NekoTanApp"])
+        .executable(name: "nekotan", targets: ["nekotan"])
     ],
-    dependencies: [
-        // Add SwiftLint as a dependency for code quality
-        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.52.4")
-    ],
+    dependencies: [],
     targets: [
-        // Library target for reuse across platforms
-        .target(
-            name: "NekoTanLib",
-            dependencies: [],
-            resources: [
-                .copy("../../fonts")
-            ]
-        ),
-        // Executable target that uses the library
         .executableTarget(
-            name: "NekoTanApp",
-            dependencies: ["NekoTanLib"],
+            name: "nekotan",
             path: "Sources",
             resources: [
-                .copy("../fonts")
+                .process("../fonts")
             ]
         ),
-        // Unit tests
         .testTarget(
             name: "NekoTanTests",
-            dependencies: ["NekoTanLib"],
+            dependencies: ["nekotan"],
             path: "Tests/NekoTanTests"
         ),
-        // UI tests
         .testTarget(
             name: "NekoTanUITests",
-            dependencies: ["NekoTanLib"],
+            dependencies: ["nekotan"],
             path: "Tests/NekoTanUITests"
         )
     ])

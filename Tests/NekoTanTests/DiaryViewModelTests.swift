@@ -7,7 +7,7 @@
 
 import XCTest
 import Combine
-@testable import NekoTanLib
+@testable import nekotan
 
 // Mock implementation of DiaryDataService for testing
 class MockDiaryDataService: DiaryDataService {

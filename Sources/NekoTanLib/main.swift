@@ -2,9 +2,9 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
 // For Apple platforms, use SwiftUI lifecycle
-import NekoTanLib
+import nekotan
 
-@main
+// Removed @main attribute to avoid conflicts with package structure
 struct NekoTanAppMain {
     static func main() {
         if #available(iOS 14.0, macOS 11.0, *) {

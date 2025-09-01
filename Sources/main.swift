@@ -1,4 +1,10 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+// Entry point for the nekoTan application
+import SwiftUI
+import nekoTan
 
-print("Hello, world!")
+// Start the application
+if #available(iOS 14.0, macOS 11.0, *) {
+    NekoTanAppMain.main()
+} else {
+    print("This app requires iOS 14+ or macOS 11+")
+}
