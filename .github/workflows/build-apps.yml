@@ -51,7 +51,7 @@ jobs:
           echo "にゃんこ～ iOSアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=18.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
             -configuration Debug \
             clean build
       
@@ -96,7 +96,7 @@ jobs:
           echo "にゃんこ～ iPadOSアプリをビルドするにゃ～ ✨"
           xcodebuild -project NekoTan.xcodeproj \
             -scheme NekoTan \
-            -destination 'platform=iOS Simulator,name=iPad (9th generation),OS=18.0' \
+            -destination 'platform=iOS Simulator,name=iPad (10th generation),OS=18.4' \
             -configuration Debug \
             clean build
       
