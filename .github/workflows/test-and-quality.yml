@@ -1,0 +1,230 @@
+name: 🐾 ねこたんテストと品質チェック (Test & Quality)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: '実行するテストの種類を選んでね～ 🔍'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - unit-tests
+        - ui-tests
+        - lint
+        - coverage
+
+env:
+  XCODE_VERSION: '16.4'
+  SWIFTLINT_VERSION: '0.52.4'
+
+jobs:
+  setup-environment:
+    name: 🔧 環境セットアップ
+    runs-on: macos-latest
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 📦 依存関係をインストール
+        run: |
+          echo "にゃんこ～ Swift Packageの依存関係を解決するにゃ～ 📦"
+          xcodebuild -resolvePackageDependencies -project NekoTan.xcodeproj
+
+  swiftlint-check:
+    name: 📝 SwiftLintコード品質チェック
+    runs-on: macos-latest
+    needs: setup-environment
+    if: github.event.inputs.test_type == 'lint' || github.event.inputs.test_type == 'all' || github.event.inputs.test_type == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🔍 SwiftLintを実行
+        uses: norio-nomura/action-swiftlint@3.2.1
+        with:
+          swiftlint-version: ${{ env.SWIFTLINT_VERSION }}
+          args: --config .swiftlint.yml
+
+  unit-tests:
+    name: 🧪 単体テスト
+    runs-on: macos-latest
+    needs: setup-environment
+    if: github.event.inputs.test_type == 'unit-tests' || github.event.inputs.test_type == 'all' || github.event.inputs.test_type == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 🧪 単体テストを実行
+        run: |
+          echo "にゃんこ～ 単体テストを実行するにゃ～ 🧪"
+          xcodebuild test -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 15' \
+            -testPlan NekoTanTests \
+            -enableCodeCoverage YES
+      
+      - name: 📊 コードカバレッジレポートを生成
+        run: |
+          echo "にゃんこ～ コードカバレッジレポートを生成するにゃ～ 📊"
+          xcrun xccov view --report --json build/Logs/Test/*.xcresult > coverage-report.json
+          echo "カバレッジレポートの最初の10行を表示するにゃ～"
+          head -n 10 coverage-report.json
+      
+      - name: 💾 カバレッジレポートを保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage-report
+          path: coverage-report.json
+          retention-days: 30
+
+  ui-tests:
+    name: 🖱️ UIテスト
+    runs-on: macos-latest
+    needs: setup-environment
+    if: github.event.inputs.test_type == 'ui-tests' || github.event.inputs.test_type == 'all' || github.event.inputs.test_type == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 📱 シミュレーターを起動
+        run: |
+          echo "にゃんこ～ シミュレーターを起動するにゃ～ 📱"
+          xcrun simctl boot 'iPhone 15'
+          sleep 5 # シミュレーターが完全に起動するのを待つ
+      
+      - name: 🖱️ UIテストを実行
+        run: |
+          echo "にゃんこ～ UIテストを実行するにゃ～ 🖱️"
+          xcodebuild test -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 15' \
+            -testPlan NekoTanUITests
+      
+      - name: 📸 テストスクリーンショットを保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-screenshots
+          path: /Users/runner/Library/Developer/Xcode/DerivedData/**/TestProducts/**/Products/**/*.png
+          retention-days: 30
+
+  test-coverage:
+    name: 📊 カバレッジ分析
+    runs-on: macos-latest
+    needs: unit-tests
+    if: github.event.inputs.test_type == 'coverage' || github.event.inputs.test_type == 'all' || github.event.inputs.test_type == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+      
+      - name: 📊 カバレッジレポートを分析
+        run: |
+          echo "にゃんこ～ コードカバレッジを分析するにゃ～ 📊"
+          # カバレッジツールをインストール
+          gem install slather
+          
+          # カバレッジレポートを生成
+          slather coverage \
+            --input-format xccov \
+            --output-directory coverage \
+            --html \
+            NekoTan.xcodeproj
+          
+          # カバレッジの概要を表示
+          echo "コードカバレッジの概要を表示するにゃ～"
+          cat coverage/index.html | grep -A 10 "Total Coverage"
+      
+      - name: 💾 HTMLカバレッジレポートを保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-coverage-report
+          path: coverage/
+          retention-days: 30
+
+  summary:
+    name: 📋 テストと品質チェックの概要
+    runs-on: ubuntu-latest
+    needs: [swiftlint-check, unit-tests, ui-tests, test-coverage]
+    if: always()
+    steps:
+      - name: 🐾 結果をまとめる
+        run: |
+          echo "## 🐾 ねこたんのテストと品質チェック結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # SwiftLintの結果
+          if [ "${{ needs.swiftlint-check.result }}" = "success" ]; then
+            echo "✅ SwiftLintコード品質チェック: 合格" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.swiftlint-check.result }}" = "skipped" ]; then
+            echo "⏭️ SwiftLintコード品質チェック: スキップされました" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ SwiftLintコード品質チェック: 不合格" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # 単体テストの結果
+          if [ "${{ needs.unit-tests.result }}" = "success" ]; then
+            echo "✅ 単体テスト: 合格" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.unit-tests.result }}" = "skipped" ]; then
+            echo "⏭️ 単体テスト: スキップされました" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ 単体テスト: 不合格" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # UIテストの結果
+          if [ "${{ needs.ui-tests.result }}" = "success" ]; then
+            echo "✅ UIテスト: 合格" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.ui-tests.result }}" = "skipped" ]; then
+            echo "⏭️ UIテスト: スキップされました" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ UIテスト: 不合格" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # カバレッジ分析の結果
+          if [ "${{ needs.test-coverage.result }}" = "success" ]; then
+            echo "✅ カバレッジ分析: 完了" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.test-coverage.result }}" = "skipped" ]; then
+            echo "⏭️ カバレッジ分析: スキップされました" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ カバレッジ分析: 失敗" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "にゃんこ～ テストと品質チェックが完了しましたにゃ～ 💕" >> $GITHUB_STEP_SUMMARY
+          
+          # 全体の結果
+          if [ "${{ needs.swiftlint-check.result }}" = "success" ] && \
+             [ "${{ needs.unit-tests.result }}" = "success" ] && \
+             [ "${{ needs.ui-tests.result }}" = "success" ]; then
+            echo "✅ 全体の結果: すべてのチェックに合格しました！🎉" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ 全体の結果: いくつかのチェックに不合格があります。ログを確認してください。" >> $GITHUB_STEP_SUMMARY
+          fi

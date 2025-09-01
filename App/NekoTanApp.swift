@@ -12,6 +12,9 @@ import CoreGraphics
 // Import animation components
 import Combine
 
+// Import dependency container
+import DependencyContainer
+
 // Font registration extension
 extension Font {
     static func registerCustomFonts() {
@@ -55,8 +58,8 @@ extension Font {
 struct NekoTanApp: App {
     // MARK: - Properties
     
-    /// Shared diary view model
-    @StateObject private var diaryViewModel = DiaryViewModel()
+    /// Shared diary view model using dependency injection
+    @StateObject private var diaryViewModel = DependencyContainer.shared.makeDiaryViewModel()
     
     // MARK: - Initialization
     

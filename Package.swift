@@ -14,6 +14,10 @@ let package = Package(
         .executable(name: "nekotan", targets: ["nekotan"]),
         .library(name: "NekoTanLib", targets: ["NekoTanLib"])
     ],
+    dependencies: [
+        // Add SwiftLint as a dependency for code quality
+        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.52.4")
+    ],
     targets: [
         // Main executable target
         .executableTarget(
@@ -26,10 +30,22 @@ let package = Package(
         // Library target for reuse across platforms
         .target(
             name: "NekoTanLib",
+            dependencies: [],
             sources: ["Views"],
             resources: [
                 .copy("../fonts")
             ]
         ),
-    ]
-)
+        // Unit tests
+        .testTarget(
+            name: "NekoTanTests",
+            dependencies: ["NekoTanLib"],
+            path: "Tests/NekoTanTests"
+        ),
+        // UI tests
+        .testTarget(
+            name: "NekoTanUITests",
+            dependencies: ["NekoTanLib"],
+            path: "Tests/NekoTanUITests"
+        )
+    ])
