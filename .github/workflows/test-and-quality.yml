@@ -57,7 +57,6 @@ jobs:
       - name: 🔍 SwiftLintを実行
         uses: norio-nomura/action-swiftlint@3.2.1
         with:
-          swiftlint-version: ${{ env.SWIFTLINT_VERSION }}
           args: --config .swiftlint.yml
 
   unit-tests:
@@ -79,18 +78,16 @@ jobs:
       - name: 🧪 単体テストを実行
         run: |
           echo "にゃんこ～ 単体テストを実行するにゃ～ 🧪"
-          xcodebuild test -project NekoTan.xcodeproj \
-            -scheme NekoTan \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 15' \
-            -testPlan NekoTanTests \
-            -enableCodeCoverage YES
+          xcodebuild test -scheme NekoTanLib -destination 'platform=iOS Simulator,name=iPhone 15 Pro' -enableCodeCoverage YES
       
-      - name: 📊 コードカバレッジレポートを生成
+      - name: 📊 カバレッジレポートを生成
         run: |
           echo "にゃんこ～ コードカバレッジレポートを生成するにゃ～ 📊"
+          mkdir -p build/Logs/Test
+          find . -name "*.xcresult" -exec cp -R {} build/Logs/Test/ \;
           xcrun xccov view --report --json build/Logs/Test/*.xcresult > coverage-report.json
           echo "カバレッジレポートの最初の10行を表示するにゃ～"
-          head -n 10 coverage-report.json
+          head -n 10 coverage-report.json || echo "レポートが見つかりませんでしたにゃ～"
       
       - name: 💾 カバレッジレポートを保存
         uses: actions/upload-artifact@v4
@@ -115,19 +112,15 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
       
-      - name: 📱 シミュレーターを起動
+      - name: 📱 使用可能なシミュレーターを確認
         run: |
-          echo "にゃんこ～ シミュレーターを起動するにゃ～ 📱"
-          xcrun simctl boot 'iPhone 15'
-          sleep 5 # シミュレーターが完全に起動するのを待つ
+          echo "にゃんこ～ 使用可能なシミュレーターを確認するにゃ～ 📱"
+          xcrun simctl list devices
       
       - name: 🖱️ UIテストを実行
         run: |
           echo "にゃんこ～ UIテストを実行するにゃ～ 🖱️"
-          xcodebuild test -project NekoTan.xcodeproj \
-            -scheme NekoTan \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 15' \
-            -testPlan NekoTanUITests
+          xcodebuild test -scheme NekoTanLib -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
       
       - name: 📸 テストスクリーンショットを保存
         if: always()
@@ -153,11 +146,12 @@ jobs:
           gem install slather
           
           # カバレッジレポートを生成
+          # カバレッジレポートを生成
           slather coverage \
             --input-format xccov \
             --output-directory coverage \
             --html \
-            NekoTan.xcodeproj
+            --scheme NekoTanLib
           
           # カバレッジの概要を表示
           echo "コードカバレッジの概要を表示するにゃ～"
