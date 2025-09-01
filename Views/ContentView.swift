@@ -23,31 +23,62 @@ struct ContentView: View {
     /// State for animation settings
     @AppStorage("enableAnimations") private var enableAnimations = true
     
+    /// State for cute color theme
+    @AppStorage("themeColor") private var themeColor = 0 // 0: pink, 1: purple, 2: blue, 3: yellow
+    
     // MARK: - Body
     
     var body: some View {
         ZStack {
-            TabView(selection: $selectedTab) {
-                // Diary list tab
-                DiaryListView(viewModel: diaryViewModel)
-                    .tabItem {
-                        Label("Diary", systemImage: "book.fill")
-                    }
-                    .tag(0)
+            // Background gradient
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    themeColors[themeColor].opacity(0.1), 
+                    themeColors[themeColor].opacity(0.3)
+                ]), 
+                startPoint: .top, 
+                endPoint: .bottom
+            )
+            .edgesIgnoringSafeArea(.all)
+            
+            // Main content with cute border
+            VStack {
+                TabView(selection: $selectedTab) {
+                    // Diary list tab
+                    DiaryListView(viewModel: diaryViewModel)
+                        .tabItem {
+                            Label("日記", systemImage: "book.fill")
+                                .foregroundColor(themeColors[themeColor])
+                        }
+                        .tag(0)
+                    
+                    // Statistics tab
+                    StatisticsView(viewModel: diaryViewModel)
+                        .tabItem {
+                            Label("統計", systemImage: "chart.bar.fill")
+                                .foregroundColor(themeColors[themeColor])
+                        }
+                        .tag(1)
+                    
+                    // Settings Tab with cute animation
+                    SettingsView()
+                        .tabItem {
+                            Image(systemName: "gearshape.fill")
+                                .sparkleAnimation(frequency: 1.5)
+                            Text("設定")
+                        }
+                        .tag(2)
+                }
+                .accentColor(themeColors[themeColor])
+                .kawaiiBorder(colors: [themeColors[themeColor], themeColors[(themeColor + 1) % 4]], width: 3, cornerRadius: 20)
+                .padding()
+                .shadow(color: themeColors[themeColor].opacity(0.3), radius: 10, x: 0, y: 5)
                 
-                // Statistics tab (placeholder for future implementation)
-                StatisticsView(viewModel: diaryViewModel)
-                    .tabItem {
-                        Label("Statistics", systemImage: "chart.bar.fill")
-                    }
-                    .tag(1)
-                
-                // Settings tab (placeholder for future implementation)
-                SettingsView()
-                    .tabItem {
-                        Label("Settings", systemImage: "gear")
-                    }
-                    .tag(2)
+                // Floating notification
+                if let notification = diaryViewModel.notification {
+                    NotificationBanner(message: notification, color: themeColors[themeColor])
+                        .floatAnimation(amplitude: 8, frequency: 4)
+                }
             }
             
             // Apply sakura effect if animations are enabled
@@ -56,179 +87,354 @@ struct ContentView: View {
             }
         }
     }
+    
+    // MARK: - Computed Properties
+    
+    /// Theme colors array
+    private var themeColors: [Color] {
+        return [
+            Color.pink,
+            Color.purple,
+            Color.blue,
+            Color.yellow
+        ]
+    }
+}
+
+/// Notification banner view
+struct NotificationBanner: View {
+    /// The message to display
+    let message: String
+    
+    /// The color of the banner
+    let color: Color
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "heart.fill")
+                .foregroundColor(.white)
+                .padding(.trailing, 5)
+            Text(message)
+                .foregroundColor(.white)
+                .font(.kleeOne(size: 14))
+                .fontWeight(.bold)
+        }
+        .padding(10)
+        .background(color)
+        .cornerRadius(20)
+        .shadow(radius: 5)
+        .padding(.horizontal, 20)
+    }
 }
 
 // MARK: - StatisticsView
 
-/// View for displaying diary statistics
+/// View for displaying diary statistics with cute design
 struct StatisticsView: View {
     // MARK: - Properties
     
     /// Diary view model
     @ObservedObject var viewModel: DiaryViewModel
     
+    /// State for animation settings
+    @AppStorage("enableAnimations") private var enableAnimations = true
+    
+    /// Theme color
+    @AppStorage("themeColor") private var themeColor = 0 // 0: pink, 1: purple, 2: blue, 3: yellow
+    
+    // MARK: - Theme colors
+    
+    private let themeColors = [
+        Color.pink,
+        Color.purple,
+        Color.blue,
+        Color.yellow
+    ]
+    
     // MARK: - Body
     
     var body: some View {
         NavigationView {
-            List {
-                // Category statistics
-                Section(header: Text("Categories").font(.kleeOne(size: 18))) {
-                    ForEach(viewModel.categories.filter { $0.count > 0 }.sorted(by: { $0.count > $1.count }).prefix(10)) { category in
+            ZStack {
+                List {
+                    // Total entries with cute animation
+                    Section {
                         HStack {
-                            Text(category.name)
-                                .font(.kleeOne(size: 16))
                             Spacer()
-                            Text("\(category.count)")
-                                .foregroundColor(.secondary)
-                                .font(.kleeOne(size: 14))
-                        }
-                    }
-                }
-                
-                // Tag statistics
-                Section(header: Text("Tags").font(.kleeOne(size: 18))) {
-                    ForEach(viewModel.tags.filter { $0.count > 0 }.sorted(by: { $0.count > $1.count }).prefix(10)) { tag in
-                        HStack {
-                            Text(tag.name)
-                                .font(.kleeOne(size: 16))
+                            VStack {
+                                Image(systemName: "book.fill")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .foregroundColor(themeColors[themeColor])
+                                    .floatAnimation(amplitude: 8, frequency: 2)
+                                Text("総日記数")
+                                    .font(.kleeOne(size: 18))
+                                    .foregroundColor(themeColors[themeColor])
+                                Text("\(viewModel.diaries.count)")
+                                    .font(.system(size: 36, weight: .bold))
+                                    .foregroundColor(themeColors[themeColor])
+                                    .bounceAnimation(strength: 0.3, duration: 1)
+                            }
                             Spacer()
-                            Text("\(tag.count)")
-                                .foregroundColor(.secondary)
-                                .font(.kleeOne(size: 14))
                         }
-                    }
-                }
-                
-                // General statistics
-                Section(header: Text("General")) {
-                    HStack {
-                        Text("Total Entries")
-                        Spacer()
-                        Text("\(viewModel.diaries.count)")
-                            .foregroundColor(.secondary)
+                        .padding()
                     }
                     
-                    if let oldestDate = viewModel.diaries.map({ $0.date }).min() {
-                        HStack {
-                            Text("First Entry")
-                            Spacer()
-                            Text(oldestDate, style: .date)
-                                .foregroundColor(.secondary)
+                    // Category statistics with cute design
+                    Section(header: Text("カテゴリー統計").font(.kleeOne(size: 18)).foregroundColor(themeColors[themeColor])) {
+                        ForEach(viewModel.categories.filter { $0.count > 0 }.sorted(by: { $0.count > $1.count }).prefix(10)) { category in
+                            HStack {
+                                // Category icon
+                                Image(systemName: categoryIcon(for: category.name))
+                                    .foregroundColor(categoryColor(for: category.name))
+                                Text(category.name)
+                                    .font(.kleeOne(size: 16))
+                                Spacer()
+                                Text("\(category.count)")
+                                    .font(.kleeOne(size: 14))
+                                    .foregroundColor(themeColors[themeColor])
+                            }
+                            .kawaiiBorder(colors: [themeColors[themeColor], themeColors[(themeColor + 1) % 4]], width: 1, cornerRadius: 8)
+                            .padding(4)
                         }
                     }
                     
-                    if let newestDate = viewModel.diaries.map({ $0.date }).max() {
-                        HStack {
-                            Text("Latest Entry")
-                            Spacer()
-                            Text(newestDate, style: .date)
-                                .foregroundColor(.secondary)
+                    // Tag statistics with cute design
+                    Section(header: Text("タグ統計").font(.kleeOne(size: 18)).foregroundColor(themeColors[themeColor])) {
+                        ForEach(viewModel.tags.filter { $0.count > 0 }.sorted(by: { $0.count > $1.count }).prefix(10)) { tag in
+                            HStack {
+                                Image(systemName: "tag.fill")
+                                    .foregroundColor(themeColors[(themeColor + 2) % 4])
+                                Text(tag.name)
+                                    .font(.kleeOne(size: 16))
+                                Spacer()
+                                Text("\(tag.count)")
+                                    .font(.kleeOne(size: 14))
+                                    .foregroundColor(themeColors[themeColor])
+                            }
+                            .kawaiiBorder(colors: [themeColors[(themeColor + 2) % 4], themeColors[(themeColor + 3) % 4]], width: 1, cornerRadius: 8)
+                            .padding(4)
                         }
                     }
+                    
+                    // General statistics with cute design
+                    Section(header: Text("基本統計").font(.kleeOne(size: 18)).foregroundColor(themeColors[themeColor])) {
+                        if let oldestDate = viewModel.diaries.map({ $0.date }).min() {
+                            HStack {
+                                Image(systemName: "calendar.circle.fill")
+                                    .foregroundColor(themeColors[themeColor])
+                                Text("最初の日記")
+                                    .font(.kleeOne(size: 16))
+                                Spacer()
+                                Text(formatDate(oldestDate))
+                                    .font(.kleeOne(size: 14))
+                                    .foregroundColor(themeColors[themeColor])
+                            }
+                            .kawaiiBorder(colors: [themeColors[themeColor], themeColors[(themeColor + 1) % 4]], width: 1, cornerRadius: 8)
+                            .padding(4)
+                        }
+                        
+                        if let newestDate = viewModel.diaries.map({ $0.date }).max() {
+                            HStack {
+                                Image(systemName: "calendar.badge.plus")
+                                    .foregroundColor(themeColors[themeColor])
+                                Text("最新の日記")
+                                    .font(.kleeOne(size: 16))
+                                Spacer()
+                                Text(formatDate(newestDate))
+                                    .font(.kleeOne(size: 14))
+                                    .foregroundColor(themeColors[themeColor])
+                            }
+                            .kawaiiBorder(colors: [themeColors[themeColor], themeColors[(themeColor + 1) % 4]], width: 1, cornerRadius: 8)
+                            .padding(4)
+                        }
+                        
+                        // Average entries per month
+                        HStack {
+                            Image(systemName: "chart.bar.fill")
+                                .foregroundColor(themeColors[themeColor])
+                            Text("月間平均")
+                                .font(.kleeOne(size: 16))
+                            Spacer()
+                            Text("\(calculateAverageEntriesPerMonth()) 件")
+                                .font(.kleeOne(size: 14))
+                                .foregroundColor(themeColors[themeColor])
+                        }
+                        .kawaiiBorder(colors: [themeColors[themeColor], themeColors[(themeColor + 1) % 4]], width: 1, cornerRadius: 8)
+                        .padding(4)
+                    }
                 }
+                .navigationTitle("統計")
             }
-            .navigationTitle("Statistics")
+            .wavyBackground(color: themeColors[themeColor].opacity(0.1))
         }
+    }
+    
+    // MARK: - Helper methods
+    
+    /// Format date in Japanese style
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter.string(from: date)
+    }
+    
+    /// Get icon for category
+    private func categoryIcon(for category: String) -> String {
+        switch category {
+        case "未分類": return "folder.fill"
+        case "日常": return "house.fill"
+        case "仕事": return "briefcase.fill"
+        case "勉強": return "book.fill"
+        case "趣味": return "gamecontroller.fill"
+        case "思考": return "brain.fill"
+        case "旅行": return "airplane.fill"
+        case "健康": return "heart.fill"
+        case "創作": return "paintbrush.fill"
+        case "読書": return "book.closed.fill"
+        case "料理": return "food.fill"
+        case "夢": return "moon.stars.fill"
+        case "目標": return "target.fill"
+        case "映画": return "film.fill"
+        case "ゲーム": return "gamecontroller.fill"
+        case "音楽": return "music.note.fill"
+        default: return "folder.fill"
+        }
+    }
+    
+    /// Get color for category
+    private func categoryColor(for category: String) -> Color {
+        switch category {
+        case "未分類": return .gray
+        case "日常": return .blue
+        case "仕事": return .indigo
+        case "勉強": return .green
+        case "趣味": return .purple
+        case "思考": return .amber
+        case "旅行": return .orange
+        case "健康": return .red
+        case "創作": return .pink
+        case "読書": return .brown
+        case "料理": return .yellow
+        case "夢": return .violet
+        case "目標": return .teal
+        case "映画": return .cyan
+        case "ゲーム": return .mint
+        case "音楽": return .indigo
+        default: return .gray
+        }
+    }
+    
+    /// Calculate average entries per month
+    private func calculateAverageEntriesPerMonth() -> Int {
+        if viewModel.diaries.isEmpty {
+            return 0
+        }
+        
+        guard let oldestDate = viewModel.diaries.map({ $0.date }).min(),
+              let newestDate = viewModel.diaries.map({ $0.date }).max() else {
+            return 0
+        }
+        
+        let calendar = Calendar.current
+        let months = calendar.dateComponents([.month], from: oldestDate, to: newestDate).month ?? 0
+        
+        // At least 1 month
+        let monthCount = max(1, months + 1)
+        
+        return viewModel.diaries.count / monthCount
     }
 }
 
-// MARK: - SettingsView
-
-/// View for application settings
+// MARK: - Settings View with cute design
 struct SettingsView: View {
-    // MARK: - Properties
-    
-    /// State for dark mode preference
     @AppStorage("isDarkMode") private var isDarkMode = false
-    
-    /// State for font size preference
+    @AppStorage("enableAnimations") private var enableAnimations = true
     @AppStorage("fontSize") private var fontSize = 1 // 0: small, 1: medium, 2: large
-    
-    /// State for showing about information
-    @State private var showingAbout = false
-    
-    // MARK: - Body
+    @AppStorage("themeColor") private var themeColor = 0 // 0: pink, 1: purple, 2: blue, 3: yellow
+    @AppStorage("showSakuraEffect") private var showSakuraEffect = true
     
     var body: some View {
         NavigationView {
             Form {
-                // Appearance settings
-                Section(header: Text("Appearance")) {
-                    Toggle("Dark Mode", isOn: $isDarkMode)
+                // Appearance Section
+                Section(header: Text("見た目").font(.kleeOne(size: 18))) {
+                    // Dark Mode Toggle
+                    Toggle("ダークモード", isOn: $isDarkMode)
+                        .onChange(of: isDarkMode) {
+                            // Update appearance when dark mode setting changes
+                            if isDarkMode {
+                                UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .dark
+                            } else {
+                                UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .light
+                            }
+                        }
                     
-                    Picker("Font Size", selection: $fontSize) {
-                        Text("Small").tag(0)
-                        Text("Medium").tag(1)
-                        Text("Large").tag(2)
+                    // Animation Toggle
+                    Toggle("アニメーション", isOn: $enableAnimations)
+                    
+                    // Cherry Blossom Effect Toggle
+                    Toggle("桜のエフェクト", isOn: $showSakuraEffect)
+                    
+                    // Font Size Picker
+                    Picker("フォントサイズ", selection: $fontSize) {
+                        Text("小さい").tag(0)
+                        Text("普通").tag(1)
+                        Text("大きい").tag(2)
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     
-                    Toggle("Enable Animations", isOn: $enableAnimations)
-                        .onChange(of: enableAnimations) { newValue in
-                            // Force refresh the view when animation setting changes
-                            // This is needed to apply/remove the sakura effect
+                    // Theme Color Picker
+                    Section(header: Text("テーマカラー").font(.kleeOne(size: 16))) {
+                        HStack(spacing: 12) {
+                            Button(action: { themeColor = 0 }) {
+                                Circle().fill(Color.pink).frame(width: 40, height: 40)
+                                    .overlay(themeColor == 0 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
+                                    .bounceAnimation(strength: 0.5, duration: 0.5)
+                            }
+                            Button(action: { themeColor = 1 }) {
+                                Circle().fill(Color.purple).frame(width: 40, height: 40)
+                                    .overlay(themeColor == 1 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
+                                    .bounceAnimation(strength: 0.5, duration: 0.5)
+                            }
+                            Button(action: { themeColor = 2 }) {
+                                Circle().fill(Color.blue).frame(width: 40, height: 40)
+                                    .overlay(themeColor == 2 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
+                                    .bounceAnimation(strength: 0.5, duration: 0.5)
+                            }
+                            Button(action: { themeColor = 3 }) {
+                                Circle().fill(Color.yellow).frame(width: 40, height: 40)
+                                    .overlay(themeColor == 3 ? Image(systemName: "checkmark").foregroundColor(.white) : nil)
+                                    .bounceAnimation(strength: 0.5, duration: 0.5)
+                            }
                         }
+                    }
                 }
                 
-                // About section
-                Section {
-                    Button("About NekoTan") {
-                        showingAbout = true
+                // About Section
+                Section(header: Text("アプリについて").font(.kleeOne(size: 18))) {
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Image(systemName: "heart.fill")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .foregroundColor(Color.pink)
+                                .floatAnimation(amplitude: 5, frequency: 1)
+                            Text("ネコタンの日記")
+                                .font(.kleeOne(size: 24))
+                                .foregroundColor(Color.pink)
+                            Text("バージョン 1.0")
+                                .font(.kleeOne(size: 14))
+                                .foregroundColor(Color.purple)
+                        }
+                        Spacer()
                     }
                 }
             }
-            .navigationTitle("Settings")
-            .sheet(isPresented: $showingAbout) {
-                aboutView
-            }
-        }
-    }
-    
-    // MARK: - Subviews
-    
-    /// About view
-    private var aboutView: some View {
-        NavigationView {
-            List {
-                Section {
-                    VStack(spacing: 20) {
-                        Image(systemName: "book.closed.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.accentColor)
-                        
-                        Text("NekoTan's Diary")
-                            .font(.title)
-                        
-                        Text("Version 1.0.0")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                }
-                
-                Section(header: Text("About")) {
-                    Text("NekoTan's Diary is a simple diary application for recording your daily thoughts and experiences. Organize your entries with categories and tags, and easily search through your past memories.")
-                }
-                
-                Section(header: Text("Credits")) {
-                    Text("Original web application by Shizuki Nekotan")
-                    Text("Swift version developed for Apple platforms")
-                }
-            }
-            .listStyle(InsetGroupedListStyle())
-            .navigationTitle("About")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        showingAbout = false
-                    }
-                }
-            }
+            .navigationTitle("設定")
+            .wavyBackground(color: Color.pink.opacity(0.1))
         }
     }
 }

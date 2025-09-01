@@ -36,6 +36,9 @@ class DiaryViewModel: ObservableObject {
     /// Selected tag for filtering
     @Published var selectedTag: String = ""
     
+    /// Notification message to display
+    @Published var notification: String? = nil
+    
     // MARK: - Private Properties
     
     /// Service for data operations
@@ -100,6 +103,9 @@ class DiaryViewModel: ObservableObject {
                     // Update categories and tags
                     self.updateCategoriesAndTags()
                     
+                    // Show notification
+                    self.showNotification("日記が保存されました～♡") // Diary saved!
+                    
                     completion(.success(()))
                 }
             case .failure(let error):
@@ -133,6 +139,9 @@ class DiaryViewModel: ObservableObject {
                     // Update categories and tags
                     self.updateCategoriesAndTags()
                     
+                    // Show notification
+                    self.showNotification("日記が更新されました～♪") // Diary updated!
+                    
                     completion(.success(()))
                 }
             case .failure(let error):
@@ -157,6 +166,9 @@ class DiaryViewModel: ObservableObject {
                     
                     // Update categories and tags
                     self.updateCategoriesAndTags()
+                    
+                    // Show notification
+                    self.showNotification("日記が削除されました～") // Diary deleted!
                     
                     completion(.success(()))
                 }
@@ -185,6 +197,10 @@ class DiaryViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.diaries = diaries
                     self.updateCategoriesAndTags()
+                    
+                    // Show notification
+                    self.showNotification("日記がインポートされました～✨") // Diaries imported!
+                    
                     completion(.success(()))
                 }
             case .failure(let error):
@@ -217,6 +233,17 @@ class DiaryViewModel: ObservableObject {
     private func setupBindings() {
         // Example of potential future bindings
         // This could be used to react to changes in published properties
+    }
+    
+    /// Shows a notification message
+    /// - Parameter message: The message to display
+    private func showNotification(_ message: String) {
+        self.notification = message
+        
+        // Hide notification after 3 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.notification = nil
+        }
     }
     
     /// Updates categories and tags based on current diaries

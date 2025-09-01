@@ -35,6 +35,9 @@ struct DiaryListView: View {
     /// Alert title
     @State private var alertTitle = ""
     
+    /// State for animation settings
+    @AppStorage("enableAnimations") private var enableAnimations = true
+    
     // MARK: - Body
     
     var body: some View {
@@ -44,34 +47,41 @@ struct DiaryListView: View {
                 searchAndFilterBar
                 
                 // Diary list
-                List {
-                    ForEach(viewModel.filteredDiaries) { diary in
-                        DiaryRowView(diary: diary)
-                            .contextMenu {
-                                Button(action: {
-                                    viewModel.selectedDiary = diary
-                                    // Open edit view
-                                }) {
-                                    Label("Edit", systemImage: "pencil")
+                if viewModel.filteredDiaries.isEmpty {
+                    // Empty state view with cute design
+                    emptyStateView
+                } else {
+                    List {
+                        ForEach(viewModel.filteredDiaries) { diary in
+                            DiaryRowView(diary: diary)
+                                .contextMenu {
+                                    Button(action: {
+                                        viewModel.selectedDiary = diary
+                                        // Open edit view
+                                    }) {
+                                        Label("編集", systemImage: "pencil")
+                                    }
+                                    
+                                    Button(role: .destructive, action: {
+                                        deleteDiary(diary)
+                                    }) {
+                                        Label("削除", systemImage: "trash")
+                                    }
                                 }
-                                
-                                Button(role: .destructive, action: {
-                                    deleteDiary(diary)
-                                }) {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
+                        }
                     }
+                    .listStyle(InsetGroupedListStyle())
+                    .wavyBackground()
                 }
-                .listStyle(InsetGroupedListStyle())
             }
-            .navigationTitle("Nekotan's Diary")
+            .navigationTitle("ネコタンの日記")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         showingExportImportOptions = true
                     }) {
                         Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(Color.purple)
                     }
                 }
                 
@@ -79,7 +89,9 @@ struct DiaryListView: View {
                     Button(action: {
                         showingNewDiarySheet = true
                     }) {
-                        Image(systemName: "plus")
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(Color.pink)
+                            .floatAnimation(amplitude: 5, frequency: 3)
                     }
                 }
             }
@@ -102,25 +114,26 @@ struct DiaryListView: View {
     
     // MARK: - Subviews
     
-    /// Search and filter bar view
+    /// Search and filter bar view with cute design
     private var searchAndFilterBar: some View {
         VStack(spacing: 8) {
-            // Search field
+            // Search field with cute animation
             HStack {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.pink)
+                    .floatAnimation(amplitude: 3, frequency: 2)
                 
                 // Check if animations are enabled
-                if let enableAnimations = UserDefaults.standard.object(forKey: "enableAnimations") as? Bool, enableAnimations {
+                if enableAnimations {
                     // Use animated text field for search
                     AnimatedTextField(
-                        title: "Search diaries",
+                        title: "日記を検索...",
                         text: $viewModel.searchQuery,
                         animationType: .glow,
-                        color: .pink
+                        color: Color.pink
                     )
                 } else {
-                    TextField("Search diaries", text: $viewModel.searchQuery)
+                    TextField("日記を検索...", text: $viewModel.searchQuery)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
                 
@@ -129,7 +142,8 @@ struct DiaryListView: View {
                         viewModel.searchQuery = ""
                     }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.pink)
+                            .bounceAnimation(strength: 0.5, duration: 0.3)
                     }
                 }
             }

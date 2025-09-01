@@ -38,6 +38,9 @@ struct DiaryEntryView: View {
     /// Alert title
     @State private var alertTitle = ""
     
+    /// State for animation settings
+    @AppStorage("enableAnimations") private var enableAnimations = true
+    
     // MARK: - Initialization
     
     init(viewModel: DiaryViewModel, isNewDiary: Bool, diary: DiaryEntry? = nil) {
@@ -64,17 +67,18 @@ struct DiaryEntryView: View {
     var body: some View {
         NavigationView {
             Form {
-                // Content section
-                Section(header: Text("Content")) {
+                // Content section with cute design
+                Section(header: Text("内容").font(.kleeOne(size: 18))) {
                     // Check if animations are enabled
-                    if let enableAnimations = UserDefaults.standard.object(forKey: "enableAnimations") as? Bool, enableAnimations {
+                    if enableAnimations {
                         AnimatedTextEditor(
-                            title: "Write your thoughts...",
+                            title: "今日の気持ちを書いてね～♡",
                             text: $diary.content,
                             animationType: .glow,
-                            color: .purple
+                            color: Color.purple
                         )
                         .frame(minHeight: 150)
+                        .kawaiiBorder(colors: [Color.pink, Color.purple], width: 2, cornerRadius: 10)
                     } else {
                         TextEditor(text: $diary.content)
                             .frame(minHeight: 150)
@@ -82,38 +86,44 @@ struct DiaryEntryView: View {
                     
                     HStack {
                         Spacer()
-                        Text("\(diary.content.count) characters")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Text("\(diary.content.count) 文字")
+                            .font(.kleeOne(size: 12))
+                            .foregroundColor(Color.purple)
                     }
                 }
                 
                 // Category section
-                Section(header: Text("Category")) {
+                Section(header: Text("カテゴリー").font(.kleeOne(size: 18))) {
                     Button(action: {
                         showingCategoryPicker = true
                     }) {
                         HStack {
-                            Text("Category")
+                            Image(systemName: "folder.fill")
+                                .foregroundColor(Color.pink)
+                            Text("カテゴリーを選択")
+                                .font(.kleeOne(size: 16))
                             Spacer()
                             Text(diary.category)
-                                .foregroundColor(.secondary)
+                                .font(.kleeOne(size: 16))
+                                .foregroundColor(Color.purple)
                         }
                     }
                 }
                 
                 // Tags section
-                Section(header: Text("Tags")) {
+                Section(header: Text("タグ").font(.kleeOne(size: 18))) {
                     // Current tags
                     ForEach(diary.tags, id: \.self) { tag in
                         HStack {
                             Text(tag)
+                                .font(.kleeOne(size: 16))
                             Spacer()
                             Button(action: {
                                 removeTag(tag)
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.red)
+                                    .bounceAnimation(strength: 0.5, duration: 0.3)
                             }
                         }
                     }
@@ -121,29 +131,31 @@ struct DiaryEntryView: View {
                     // Add new tag
                     HStack {
                         // Check if animations are enabled
-                        if let enableAnimations = UserDefaults.standard.object(forKey: "enableAnimations") as? Bool, enableAnimations {
+                        if enableAnimations {
                             // Use animated text field for tag input
                             AnimatedTextField(
-                                title: "Add tag",
+                                title: "タグを追加",
                                 text: $newTag,
                                 animationType: .border,
-                                color: .blue
+                                color: Color.blue
                             )
                         } else {
-                            TextField("Add tag", text: $newTag)
+                            TextField("タグを追加", text: $newTag)
                         }
                         
                         Button(action: addTag) {
                             Image(systemName: "plus.circle.fill")
+                                .foregroundColor(Color.green)
+                                .floatAnimation(amplitude: 3, frequency: 2)
                         }
                         .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                     
                     // Suggested tags
                     if !viewModel.tags.isEmpty {
-                        Text("Suggested Tags")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Text("おすすめタグ")
+                            .font(.kleeOne(size: 14))
+                            .foregroundColor(Color.purple)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
@@ -154,10 +166,12 @@ struct DiaryEntryView: View {
                                         }
                                     }) {
                                         Text(tag.name)
+                                            .font(.kleeOne(size: 14))
                                             .padding(.horizontal, 8)
                                             .padding(.vertical, 4)
-                                            .background(Color.secondary.opacity(0.2))
+                                            .background(Color.pink.opacity(0.2))
                                             .cornerRadius(8)
+                                            .bounceAnimation(strength: 0.5, duration: 1)
                                     }
                                 }
                             }
@@ -165,19 +179,21 @@ struct DiaryEntryView: View {
                     }
                 }
             }
-            .navigationTitle(isNewDiary ? "New Diary" : "Edit Diary")
+            .navigationTitle(isNewDiary ? "新しい日記" : "日記を編集")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button("キャンセル") {
                         dismiss()
                     }
+                    .foregroundColor(Color.red)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button("保存") {
                         saveDiary()
                     }
+                    .foregroundColor(Color.pink)
                     .disabled(diary.isEmpty)
                 }
             }
@@ -194,12 +210,12 @@ struct DiaryEntryView: View {
     
     // MARK: - Subviews
     
-    /// Category picker view
+    /// Category picker view with cute design
     private var categoryPickerView: some View {
         NavigationView {
             List {
                 // Default categories
-                Section(header: Text("Default Categories")) {
+                Section(header: Text("デフォルトカテゴリー").font(.kleeOne(size: 18))) {
                     ForEach(DiaryEntry.defaultCategories, id: \.self) { category in
                         Button(action: {
                             diary.category = category
@@ -207,10 +223,11 @@ struct DiaryEntryView: View {
                         }) {
                             HStack {
                                 Text(category)
+                                    .font(.kleeOne(size: 16))
                                 Spacer()
                                 if diary.category == category {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.accentColor)
+                                    Image(systemName: "heart.fill")
+                                        .foregroundColor(Color.pink)
                                 }
                             }
                         }
@@ -218,21 +235,23 @@ struct DiaryEntryView: View {
                 }
                 
                 // Custom category input
-                Section(header: Text("Custom Category")) {
-                    TextField("Enter category", text: $diary.category)
+                Section(header: Text("カスタムカテゴリー").font(.kleeOne(size: 18))) {
+                    TextField("カテゴリーを入力", text: $diary.category)
+                        .font(.kleeOne(size: 16))
                         .onSubmit {
                             showingCategoryPicker = false
                         }
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            .navigationTitle("Select Category")
+            .navigationTitle("カテゴリーを選択")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("完了") {
                         showingCategoryPicker = false
                     }
+                    .foregroundColor(Color.pink)
                 }
             }
         }
