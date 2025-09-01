@@ -10,7 +10,7 @@ import XCTest
 /// UI tests for ContentView
 class ContentViewTests: XCTestCase {
     // The XCUIApplication instance representing the app under test
-    private var app: XCUIApplication!
+    private var app: XCUIApplication?
     
     // MARK: - Setup & Teardown
     
@@ -80,7 +80,7 @@ class ContentViewTests: XCTestCase {
         XCTAssertTrue(diaryList.waitForExistence(timeout: 1.0), "Should return to main list after saving")
         
         // Verify the new diary entry is displayed
-        let newDiaryCell = diaryList.cells.containing(.staticText, identifier:"UIテストからの日記エントリー").firstMatch
+        let newDiaryCell = diaryList.cells.containing(.staticText, identifier: "UIテストからの日記エントリー").firstMatch
         XCTAssertTrue(newDiaryCell.exists, "New diary entry should be displayed in the list")
     }
     
@@ -97,7 +97,7 @@ class ContentViewTests: XCTestCase {
         
         // Check that the matching diary is displayed
         let diaryList = app.tables["diaryList"]
-        let searchResultCell = diaryList.cells.containing(.staticText, identifier:"検索テスト用日記").firstMatch
+        let searchResultCell = diaryList.cells.containing(.staticText, identifier: "検索テスト用日記").firstMatch
         XCTAssertTrue(searchResultCell.exists, "Search should find matching diary entry")
         
         // Clear search

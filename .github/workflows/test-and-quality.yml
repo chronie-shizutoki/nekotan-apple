@@ -108,13 +108,7 @@ jobs:
           echo "にゃんこ～ Xcodeプロジェクトをビルドするにゃ～ 🔧"
           xcodebuild build -project NekoTan.xcodeproj -scheme NekoTan -destination 'platform=iOS Simulator,name=iPhone 15 Pro' || echo "ビルドに失敗しましたが、続行します"
       
-      - name: 📸 テストスクリーンショットを保存
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-test-screenshots
-          path: /Users/runner/Library/Developer/Xcode/DerivedData/**/TestProducts/**/Products/**/*.png
-          retention-days: 30
+      # UIテストがビルドチェックのみに変更されたため、スクリーンショットアップロードはスキップします
 
   test-coverage:
     name: 📊 カバレッジ分析

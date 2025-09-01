@@ -120,10 +120,10 @@ struct DiaryEntryView: View {
                             Spacer()
                             Button(action: {
                                 removeTag(tag)
-                            }) {
+                            }, label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(Color.red)
-                                    .bounceAnimation(strength: 0.5, duration: 0.3)
+                                    .bounceAnimation(strength: 0.5, duration: 0.3, action: {})
                             }
                         }
                     }
@@ -164,14 +164,14 @@ struct DiaryEntryView: View {
                                         if !diary.tags.contains(tag.name) {
                                             diary.tags.append(tag.name)
                                         }
-                                    }) {
+                                    }, label: {
                                         Text(tag.name)
                                             .font(.kleeOne(size: 14))
                                             .padding(.horizontal, 8)
                                             .padding(.vertical, 4)
                                             .background(Color.pink.opacity(0.2))
                                             .cornerRadius(8)
-                                            .bounceAnimation(strength: 0.5, duration: 1)
+                                            .bounceAnimation(strength: 0.5, duration: 1, action: {})
                                     }
                                 }
                             }
@@ -220,7 +220,7 @@ struct DiaryEntryView: View {
                         Button(action: {
                             diary.category = category
                             showingCategoryPicker = false
-                        }) {
+                        }, label: {
                             HStack {
                                 Text(category)
                                     .font(.kleeOne(size: 16))

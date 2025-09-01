@@ -177,16 +177,18 @@ struct AnimatedTextEditor: View {
                     NotificationCenter.default.addObserver(
                         forName: UIResponder.keyboardWillShowNotification,
                         object: nil,
-                        queue: .main) { _ in
+                        queue: .main,
+                        using: { _ in
                             self.isFocused = true
-                        }
+                        })
                     
                     NotificationCenter.default.addObserver(
                         forName: UIResponder.keyboardWillHideNotification,
                         object: nil,
-                        queue: .main) { _ in
+                        queue: .main,
+                        using: { _ in
                             self.isFocused = false
-                        }
+                        })
                 }
                 .inputFieldAnimation(isFocused: $isFocused, type: animationType, color: color)
         }

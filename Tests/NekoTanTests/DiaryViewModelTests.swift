@@ -102,10 +102,10 @@ class MockDiaryDataService: DiaryDataService {
 /// Tests for DiaryViewModel
 class DiaryViewModelTests: XCTestCase {
     // System under test
-    private var viewModel: DiaryViewModel!
+    private var viewModel: DiaryViewModel?
     
     // Mock dependencies
-    private var mockService: MockDiaryDataService!
+    private var mockService: MockDiaryDataService?
     
     // Test helpers
     private var cancellables = Set<AnyCancellable>()

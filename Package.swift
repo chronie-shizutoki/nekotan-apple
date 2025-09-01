@@ -31,7 +31,6 @@ let package = Package(
         .target(
             name: "NekoTanLib",
             dependencies: [],
-            sources: ["Views"],
             resources: [
                 .copy("../fonts")
             ]
