@@ -1,0 +1,263 @@
+name: 🐾 ねこたんアプリビルド (Build NekoTan Apps)
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'ビルドするプラットフォームを選んでね～ 🍎'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - ios
+        - macos
+        - ipados
+
+env:
+  XCODE_VERSION: '15.2'
+  IOS_DEPLOYMENT_TARGET: '15.0'
+  MACOS_DEPLOYMENT_TARGET: '12.0'
+  IPADOS_DEPLOYMENT_TARGET: '15.0'
+
+jobs:
+  build-ios:
+    name: 📱 iOSアプリビルド
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all' || github.event.inputs.platform == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 📱 iOSシミュレーターでビルドテスト
+        run: |
+          echo "にゃんこ～ iOSアプリをビルドするにゃ～ ✨"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -configuration Debug \
+            clean build test
+      
+      - name: 📦 iOSアーカイブ作成
+        run: |
+          echo "iOSアーカイブを作成中にゃん～ 📦"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination generic/platform=iOS \
+            -configuration Release \
+            archive -archivePath build/NekoTan-iOS.xcarchive
+      
+      - name: 💾 iOSビルド成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekotan-ios-build
+          path: build/NekoTan-iOS.xcarchive
+          retention-days: 30
+
+  build-ipados:
+    name: 📱 iPadOSアプリビルド
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'ipados' || github.event.inputs.platform == 'all' || github.event.inputs.platform == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 📱 iPadOSシミュレーターでビルドテスト
+        run: |
+          echo "にゃんこ～ iPadOSアプリをビルドするにゃ～ ✨"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination 'platform=iOS Simulator,name=iPad Pro (12.9-inch) (6th generation),OS=latest' \
+            -configuration Debug \
+            clean build test
+      
+      - name: 📦 iPadOSアーカイブ作成
+        run: |
+          echo "iPadOSアーカイブを作成中にゃん～ 📦"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination generic/platform=iOS \
+            -configuration Release \
+            archive -archivePath build/NekoTan-iPadOS.xcarchive
+      
+      - name: 💾 iPadOSビルド成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekotan-ipados-build
+          path: build/NekoTan-iPadOS.xcarchive
+          retention-days: 30
+
+  build-macos:
+    name: 💻 macOSアプリビルド
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'macos' || github.event.inputs.platform == 'all' || github.event.inputs.platform == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 💻 macOSでビルドテスト
+        run: |
+          echo "にゃんこ～ macOSアプリをビルドするにゃ～ ✨"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -configuration Debug \
+            clean build test
+      
+      - name: 📦 macOSアプリ作成
+        run: |
+          echo "macOSアプリを作成中にゃん～ 📦"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            build
+      
+      - name: 💾 macOSビルド成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekotan-macos-build
+          path: build/Release
+          retention-days: 30
+
+  build-maccatalyst:
+    name: 🎪 Mac Catalystアプリビルド
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'all' || github.event.inputs.platform == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🍎 Xcode環境セットアップ
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 🎪 Mac Catalystでビルドテスト
+        run: |
+          echo "にゃんこ～ Mac Catalystアプリをビルドするにゃ～ ✨"
+          xcodebuild -project NekoTan.xcodeproj \
+            -scheme NekoTan \
+            -destination 'platform=macOS,variant=Mac Catalyst' \
+            -configuration Debug \
+            clean build test
+      
+      - name: 💾 Mac Catalystビルド成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekotan-maccatalyst-build
+          path: build/Release
+          retention-days: 30
+
+  package-apps:
+    name: 📦 アプリパッケージング
+    runs-on: macos-latest
+    needs: [build-ios, build-ipados, build-macos, build-maccatalyst]
+    if: github.event.inputs.platform == 'all' || github.event.inputs.platform == null
+    steps:
+      - name: 🐾 ねこたんのコードをチェックアウト
+        uses: actions/checkout@v4
+      
+      - name: 📱 iOSビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: nekotan-ios-build
+          path: artifacts/ios
+      
+      - name: 📱 iPadOSビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: nekotan-ipados-build
+          path: artifacts/ipados
+      
+      - name: 💻 macOSビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: nekotan-macos-build
+          path: artifacts/macos
+      
+      - name: 🎪 Mac Catalystビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: nekotan-maccatalyst-build
+          path: artifacts/maccatalyst
+      
+      - name: 📦 パッケージング
+        run: |
+          echo "にゃんこ～ アプリをパッケージングするにゃ～ 📦✨"
+          mkdir -p packages
+          
+          # バージョン情報を取得
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          BUILD_DATE=$(date +"%Y%m%d-%H%M%S")
+          
+          echo "バージョン: $VERSION"
+          echo "ビルド日時: $BUILD_DATE"
+          
+          # 成果物をまとめる
+          tar -czf "packages/nekotan-${VERSION}-${BUILD_DATE}-all-platforms.tar.gz" \
+            artifacts/ \
+            README.md \
+            LICENSE \
+            Package.swift
+      
+      - name: 💾 パッケージ成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekotan-package-all
+          path: packages/
+          retention-days: 90
+
+  notify-success:
+    name: 🎉 成功通知
+    runs-on: ubuntu-latest
+    needs: [build-ios, build-ipados, build-macos, build-maccatalyst]
+    if: success()
+    steps:
+      - name: 🐾 成功メッセージ
+        run: |
+          echo "にゃんこ～ すべてのプラットフォームでビルド成功だにゃ～ ✨🎉"
+          echo "iOS: ✅"
+          echo "iPadOS: ✅"
+          echo "macOS: ✅"
+          echo "Mac Catalyst: ✅"
+          echo "お疲れ様にゃん～ 💕"
+
+  notify-failure:
+    name: 😿 失敗通知
+    runs-on: ubuntu-latest
+    needs: [build-ios, build-ipados, build-macos, build-maccatalyst]
+    if: failure()
+    steps:
+      - name: 🐾 失敗メッセージ
+        run: |
+          echo "にゃんこ～ ビルドに失敗しちゃったにゃ～ 😿"
+          echo "でも大丈夫！また頑張るにゃん 💪"
+          echo "ログを確認して、どこが問題か調べてみてね～ 🔍"
